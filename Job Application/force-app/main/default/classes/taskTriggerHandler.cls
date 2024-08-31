@@ -18,10 +18,14 @@ public with sharing class taskTriggerHandler {
                 taskToInsert.add(tk3);
             }
         }
-        
         // Insert tasks if the list is not empty
-        if (taskToInsert.size() > 0) {
-            insert taskToInsert;
+        if (!taskToInsert.isEmpty()) {
+            try {
+                insert taskToInsert;
+                System.debug('Tasks inserted successfully.');
+            } catch (DmlException e) {
+                System.debug('Error inserting tasks: ' + e.getMessage());
+            }
         }
     }
 }
