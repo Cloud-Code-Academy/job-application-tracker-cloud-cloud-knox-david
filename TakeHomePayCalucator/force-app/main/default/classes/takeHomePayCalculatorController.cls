@@ -1,5 +1,8 @@
 public with sharing class takeHomePayCalculatorController {
-    public takeHomePayCalculatorController() {
-
+   
+    public static void federalIncomeTaxes () {
+      
     }
+
+    
 }
