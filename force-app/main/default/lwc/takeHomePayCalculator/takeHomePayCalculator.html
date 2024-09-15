@@ -1,0 +1,72 @@
+<template>
+    <lightning-card title="Take Home Pay Calculator">
+        <lightning-button label="New" slot="actions"></lightning-button>
+        <div class="slds-var-p-horizontal_small">
+            <lightning-input 
+                type="number"
+                name="salary" 
+                label="Your job income (salary)" 
+                value="" 
+                formatter="currency" 
+                step="0.01">
+            </lightning-input>
+
+            <!-- Display the combobox value from Job Application record -->
+            <lightning-combobox 
+                name="payFrequency" 
+                label="Pay frequency" 
+                value={progress} 
+                placeholder="Select Progress" 
+                options={options} 
+                onchange={handleChange}>
+            </lightning-combobox>
+            <lightning-combobox 
+            name="fileStatus" 
+            label="File Status" 
+            value={progress} 
+            placeholder="Select Progress" 
+            options={options} 
+            onchange={handleChange}>
+        </lightning-combobox>
+        <lightning-input 
+        type="number" 
+        name="dep1" 
+        label="Number of children under age 17">
+        </lightning-input>
+        <lightning-input 
+        type="number" 
+        name="dep2" 
+        label="Number of other dependents">
+        </lightning-input>
+        <lightning-input 
+        type="number"
+        name="preTaxDeductions" 
+        label="Pretax deductions withheld" 
+        value=""
+        formatter="currency" 
+        step="0.01">
+    </lightning-input>
+    <lightning-input 
+    type="number" 
+    label="State income tax rate" 
+    name="stateIncomeTaxRate" 
+    value={percentage} 
+    step="0.01" 
+    formatter="percent" 
+    onchange={handlePercentageChange}>
+   </lightning-input> 
+    <lightning-input 
+    type="number" 
+    label="City income tax rate" 
+    name="cityIncomeTaxRate" 
+    value={percentage} 
+    step="0.01" 
+    formatter="percent" 
+    onchange={handlePercentageChange}>
+    </lightning-input>
+
+        </div>
+        <p class="slds-p-horizontal_small">Card Body (custom component)</p>
+        <p slot="footer">Card Footer</p>
+    </lightning-card>
+</template>

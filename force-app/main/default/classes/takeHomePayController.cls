@@ -1,12 +1,12 @@
 public with sharing class takeHomePayController {
-
-    // Method to calculate Social Security based on Job Application data
-    public static void calSocialSecurity(List<Job_Application__c> job) {
+   
+    //NOTE - Social Security  Calculation
+    @AuraEnabled(cacheable=false)
+    public static void calSocialSecurity(List<Job_Application__c> jobs) {
         // Social Security rate
         final Decimal socialSecurity = 0.062;
-
         // Iterating over the Job Application and querying necessary fields
-        for (Job_Application__c jb : job = [SELECT Id, Pay_Frequency__c, Social_Security__c, Gross_Paycheck__c FROM Job_Application__c]) {
+        for (Job_Application__c jb : jobs) {
             if (jb.Pay_Frequency__c == 'Bi-Weekly') {
                 // Calculating Social Security deduction
                 Decimal result = jb.Gross_Paycheck__c * socialSecurity;
@@ -38,15 +38,17 @@ public with sharing class takeHomePayController {
                 System.debug('Semi-Monthly: ' + result4);
             }
         }
+        update jobs;
     }
 
-    // Method to calculate Medicare based on Job Application data
-    public static void calMedicare(List<Job_Application__c> job) {
+    //NOTE - Medicare Calculation
+    @AuraEnabled(cacheable=false)
+    public static void calMedicare(List<Job_Application__c> jobs) {
         // Medicare rate
         final Decimal medicare = 0.0145;
 
         // Iterating over the Job Application and querying necessary fields
-        for (Job_Application__c jb : job = [SELECT Id, Pay_Frequency__c, Medicare__c, Gross_Paycheck__c FROM Job_Application__c]) {
+        for (Job_Application__c jb : jobs) {
             if (jb.Pay_Frequency__c == 'Bi-Weekly') {
                 Decimal result5 = jb.Gross_Paycheck__c * medicare;
                 jb.Medicare__c = result5;
@@ -68,77 +70,122 @@ public with sharing class takeHomePayController {
                 jb.Medicare__c = result9;
             }
         }
+        update jobs;
     }
-
-    // Placeholder for the method to calculate Take Home Pay
-   
-
-        // Method to calculate take-home pay based on job applications
-        public static void calTakeHomePay(List<Job_Application__c> jobs) {
-            // Loop through each job application
-            for (Job_Application__c jb : jobs) {
-                Decimal tax = 0;
+     //NOTE - Federal Tax Calculation
+     @AuraEnabled(cacheable=false)
+     public static void calFederalTax(List<Job_Application__c> jobs){
+        final Integer numberOfChildrenUnder17 = 2000;
+        final Integer numberOfOtherDependents = 500;
     
-                // Tax calculation for Single filers
-                if (jb.Filing_Status__c == 'Single') {
-                    if (jb.Salary__c <= 11600) {
-                        tax = jb.Salary__c * 0.10;
-                    } else if (jb.Salary__c > 11600 && jb.Salary__c <= 47150) {
-                        tax = 11600 * 0.10 + (jb.Salary__c - 11600) * 0.12;
-                    } else if (jb.Salary__c > 47150 && jb.Salary__c <= 100525) {
-                        tax = 11600 * 0.10 + (47150 - 11600) * 0.12 + (jb.Salary__c - 47150) * 0.22;
-                    } else if (jb.Salary__c > 100525 && jb.Salary__c <= 191950) {
-                        tax = 11600 * 0.10 + (47150 - 11600) * 0.12 + (100525 - 47150) * 0.22 + (jb.Salary__c - 100525) * 0.24;
-                    } else if (jb.Salary__c > 191950 && jb.Salary__c <= 243725) {
-                        tax = 11600 * 0.10 + (47150 - 11600) * 0.12 + (100525 - 47150) * 0.22 + (191950 - 100525) * 0.24 + (jb.Salary__c - 191950) * 0.32;
-                    } else if (jb.Salary__c > 243725 && jb.Salary__c <= 609350) {
-                        tax = 11600 * 0.10 + (47150 - 11600) * 0.12 + (100525 - 47150) * 0.22 + (191950 - 100525) * 0.24 + (243725 - 191950) * 0.32 + (jb.Salary__c - 243725) * 0.35;
-                    } else {
-                        tax = 11600 * 0.10 + (47150 - 11600) * 0.12 + (100525 - 47150) * 0.22 + (191950 - 100525) * 0.24 + (243725 - 191950) * 0.32 + (609350 - 243725) * 0.35 + (jb.Salary__c - 609350) * 0.37;
-                    }
-                }
+        for (Job_Application__c jb : jobs) {
+            Decimal dep1 = 0;
+            Decimal dep2 = 0;
+            Decimal total = 0;
     
-                // Tax calculation for Married Filing Jointly
-                else if (jb.Filing_Status__c == 'Married') {
-                    if (jb.Salary__c <= 23200) {
-                        tax = jb.Salary__c * 0.10;
-                    } else if (jb.Salary__c > 23200 && jb.Salary__c <= 94300) {
-                        tax = 23200 * 0.10 + (jb.Salary__c - 23200) * 0.12;
-                    } else if (jb.Salary__c > 94300 && jb.Salary__c <= 201050) {
-                        tax = 23200 * 0.10 + (94300 - 23200) * 0.12 + (jb.Salary__c - 94300) * 0.22;
-                    } else if (jb.Salary__c > 201050 && jb.Salary__c <= 383900) {
-                        tax = 23200 * 0.10 + (94300 - 23200) * 0.12 + (201050 - 94300) * 0.22 + (jb.Salary__c - 201050) * 0.24;
-                    } else if (jb.Salary__c > 383900 && jb.Salary__c <= 487450) {
-                        tax = 23200 * 0.10 + (94300 - 23200) * 0.12 + (201050 - 94300) * 0.22 + (383900 - 201050) * 0.24 + (jb.Salary__c - 383900) * 0.32;
-                    } else if (jb.Salary__c > 487450 && jb.Salary__c <= 731200) {
-                        tax = 23200 * 0.10 + (94300 - 23200) * 0.12 + (201050 - 94300) * 0.22 + (383900 - 201050) * 0.24 + (487450 - 383900) * 0.32 + (jb.Salary__c - 487450) * 0.35;
-                    } else {
-                        tax = 23200 * 0.10 + (94300 - 23200) * 0.12 + (201050 - 94300) * 0.22 + (383900 - 201050) * 0.24 + (487450 - 383900) * 0.32 + (731200 - 487450) * 0.35 + (jb.Salary__c - 731200) * 0.37;
-                    }
-                }
-    
-                // Tax calculation for Head of Household
-                else if (jb.Filing_Status__c == 'Head of Household') {
-                    if (jb.Salary__c <= 16550) {
-                        tax = jb.Salary__c * 0.10;
-                    } else if (jb.Salary__c > 16550 && jb.Salary__c <= 63100) {
-                        tax = 16550 * 0.10 + (jb.Salary__c - 16550) * 0.12;
-                    } else if (jb.Salary__c > 63100 && jb.Salary__c <= 100500) {
-                        tax = 16550 * 0.10 + (63100 - 16550) * 0.12 + (jb.Salary__c - 63100) * 0.22;
-                    } else if (jb.Salary__c > 100500 && jb.Salary__c <= 191950) {
-                        tax = 16550 * 0.10 + (63100 - 16550) * 0.12 + (100500 - 63100) * 0.22 + (jb.Salary__c - 100500) * 0.24;
-                    } else if (jb.Salary__c > 191950 && jb.Salary__c <= 243700) {
-                        tax = 16550 * 0.10 + (63100 - 16550) * 0.12 + (100500 - 63100) * 0.22 + (191950 - 100500) * 0.24 + (jb.Salary__c - 191950) * 0.32;
-                    } else if (jb.Salary__c > 243700 && jb.Salary__c <= 609350) {
-                        tax = 16550 * 0.10 + (63100 - 16550) * 0.12 + (100500 - 63100) * 0.22 + (191950 - 100500) * 0.24 + (243700 - 191950) * 0.32 + (jb.Salary__c - 243700) * 0.35;
-                    } else {
-                        tax = 16550 * 0.10 + (63100 - 16550) * 0.12 + (100500 - 63100) * 0.22 + (191950 - 100500) * 0.24 + (243700 - 191950) * 0.32 + (609350 - 243700) * 0.35 + (jb.Salary__c - 609350) * 0.37;
-                    }
-                }
-    
-                // Log or handle the calculated tax for the job application record
-                System.debug('Calculated Tax for ' + jb.Id + ': ' + tax.setScale(2));
+            // Calculate deductions based on Pay Frequency
+            if (jb.Pay_Frequency__c == 'Bi-Weekly') {
+                dep1 = numberOfChildrenUnder17 / 26;
+                dep2 = numberOfOtherDependents / 26;
+                total = dep1 + dep2;
+                jb.Federal_Income_Tax__c = jb.Ded__c - total;
+            } else if (jb.Pay_Frequency__c == 'Weekly') {
+                dep1 = numberOfChildrenUnder17 / 52;
+                dep2 = numberOfOtherDependents / 52;
+                total = dep1 + dep2;
+                jb.Federal_Income_Tax__c = jb.Ded__c - total;
+            } else if (jb.Pay_Frequency__c == 'Semi-Monthly') {
+                dep1 = numberOfChildrenUnder17 / 24;
+                dep2 = numberOfOtherDependents / 24;
+                total = dep1 + dep2;
+                jb.Federal_Income_Tax__c = jb.Ded__c - total;
+            } else if (jb.Pay_Frequency__c == 'Six Month') {
+                dep1 = numberOfChildrenUnder17 / 6;
+                dep2 = numberOfOtherDependents / 6;
+                total = dep1 + dep2;
+                jb.Federal_Income_Tax__c = jb.Ded__c - total;
+            } else if (jb.Pay_Frequency__c == 'Monthly') {
+                dep1 = numberOfChildrenUnder17 / 12;
+                dep2 = numberOfOtherDependents / 12;
+                total = dep1 + dep2;
+                jb.Federal_Income_Tax__c = jb.Ded__c - total;
             }
+            
+        
         }
-    }
+        update jobs;
+     }
+     @AuraEnabled(cacheable=false)
+     public static void calDeductionWithheld(List<Job_Application__c> jobs){
+        for (Job_Application__c jb : jobs) {
+            // Calculate the pre-tax deductions withheld based on the Pay Frequency
+            if (jb.Pay_Frequency__c == 'Bi-Weekly') {
+                jb.Pretax_Deductions_Withheld__c = jb.Pretax_Deductions_Withheld__c / 26;
+            } else if (jb.Pay_Frequency__c == 'Weekly') {
+                jb.Pretax_Deductions_Withheld__c = jb.Pretax_Deductions_Withheld__c / 52;
+            } else if (jb.Pay_Frequency__c == 'Semi-Monthly') {
+                jb.Pretax_Deductions_Withheld__c = jb.Pretax_Deductions_Withheld__c / 24;
+            } else if (jb.Pay_Frequency__c == 'Six Month') {
+                jb.Pretax_Deductions_Withheld__c = jb.Pretax_Deductions_Withheld__c / 6;
+            } else if (jb.Pay_Frequency__c == 'Monthly') {
+                jb.Pretax_Deductions_Withheld__c = jb.Pretax_Deductions_Withheld__c / 12;
+            }
     
+            System.debug('Pretax Deductions Withheld Calculation for ' + jb.Id + ': ' + jb.Pretax_Deductions_Withheld__c);
+        }
+        update jobs;
+     }
+
+  
+
+        // Method to calculate State and City Income Tax based on provided tax rates
+        @AuraEnabled(cacheable=false)
+        public static void calStateAndCityTax(List<Job_Application__c> jobs) {
+            for (Job_Application__c jb : jobs) {
+                Decimal stateTax = 0;
+                Decimal cityTax = 0;
+    
+                // Calculate State Income Tax based on the State Income Tax Rate
+                if (jb.State_Income_Tax_Rate__c != null) {
+                    stateTax = jb.Gross_Paycheck__c * (jb.State_Income_Tax_Rate__c / 100); // Converting percent to decimal
+                    jb.State_Income_Tax__c = stateTax;
+                }
+    
+                // Calculate City Income Tax based on the City Income Tax Rate
+                if (jb.City_Income_Tax_Rate__c != null) {
+                    cityTax = jb.Gross_Paycheck__c * (jb.City_Income_Tax_Rate__c / 100); // Converting percent to decimal
+                    jb.City_Income_Tax__c = cityTax;
+                }
+    
+        
+            }
+            update jobs; // Update records with calculated values
+        }
+    
+    
+
+    // Method to calculate take-home pay based on job applications
+    @AuraEnabled(cacheable=false)
+    public static void calTakeHomePay(List<Job_Application__c> jobs) {
+
+
+        // Calculate Social Security and Medicare first
+        calSocialSecurity(jobs);
+        calMedicare(jobs);
+        calFederalTax(jobs);
+        calStateAndCityTax(jobs);
+        calDeductionWithheld(jobs);
+
+        for (Job_Application__c jb : [SELECT Id, Pay_Frequency__c, Pretax_deductions_withheld__c, 	Final_Pay_Check__c, Social_Security__c, Medicare__c, Gross_Paycheck__c, Federal_Income_Tax__c, State_Income_Tax__c, City_Income_Tax__c, Ded__c, Number_of_children_under_age_17__c, Number_of_other_dependents__c FROM Job_Application__c]) {
+           jb.Final_Pay_Check__c = jb.Gross_Paycheck__c - jb.Federal_Income_Tax__c - jb.Social_Security__c - jb.Medicare__c - jb.State_Income_Tax__c - jb.City_Income_Tax__c - jb.ded__c;
+            
+            System.debug('Your Final after taxes ' + jb.Final_Pay_Check__c);
+            System.debug('Your gross pay ' + jb.Gross_Paycheck__c);
+            System.debug('Your Federal Income Tax ' + jb.Federal_Income_Tax__c);
+            // Perform calculations or handle the tanke-home pay logic here
+            //jb.Final_Pay_Check__c = jb.Gross_Paycheck__c - jb.Federal_Icome_Tax__c - jb.
+            // Add calculations and updates as needed
+        }
+        update jobs;
+    }
+}
