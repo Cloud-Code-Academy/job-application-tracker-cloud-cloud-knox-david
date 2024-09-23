@@ -1,72 +1,89 @@
 <template>
     <lightning-card title="Take Home Pay Calculator">
-        <lightning-button label="New" slot="actions"></lightning-button>
-        <div class="slds-var-p-horizontal_small">
-            <lightning-input 
-                type="number"
-                name="salary" 
-                label="Your job income (salary)" 
-                value="" 
-                formatter="currency" 
-                step="0.01">
-            </lightning-input>
+        <lightning-button label="Calculate" onclick={handleCalculateTaxes} slot="actions"></lightning-button>
+        
+        <!-- Input Fields -->
+        <lightning-input 
+            type="number"
+            name="Gross_Paycheck__c"
+            label="Your job income (salary)" 
+            value={jobApplication.Gross_Paycheck__c} 
+            formatter="currency" 
+            step="0.01"
+            onchange={handleInputChange}>
+        </lightning-input>
 
-            <!-- Display the combobox value from Job Application record -->
-            <lightning-combobox 
-                name="payFrequency" 
-                label="Pay frequency" 
-                value={progress} 
-                placeholder="Select Progress" 
-                options={options} 
-                onchange={handleChange}>
-            </lightning-combobox>
-            <lightning-combobox 
-            name="fileStatus" 
-            label="File Status" 
-            value={progress} 
-            placeholder="Select Progress" 
-            options={options} 
-            onchange={handleChange}>
+        <lightning-combobox 
+            name="Pay_Frequency__c"
+            label="Pay frequency" 
+            value={jobApplication.Pay_Frequency__c} 
+            options={payFrequencyOptions} 
+            onchange={handleInputChange}>
         </lightning-combobox>
-        <lightning-input 
-        type="number" 
-        name="dep1" 
-        label="Number of children under age 17">
-        </lightning-input>
-        <lightning-input 
-        type="number" 
-        name="dep2" 
-        label="Number of other dependents">
-        </lightning-input>
-        <lightning-input 
-        type="number"
-        name="preTaxDeductions" 
-        label="Pretax deductions withheld" 
-        value=""
-        formatter="currency" 
-        step="0.01">
-    </lightning-input>
-    <lightning-input 
-    type="number" 
-    label="State income tax rate" 
-    name="stateIncomeTaxRate" 
-    value={percentage} 
-    step="0.01" 
-    formatter="percent" 
-    onchange={handlePercentageChange}>
-   </lightning-input> 
-    <lightning-input 
-    type="number" 
-    label="City income tax rate" 
-    name="cityIncomeTaxRate" 
-    value={percentage} 
-    step="0.01" 
-    formatter="percent" 
-    onchange={handlePercentageChange}>
-    </lightning-input>
 
-        </div>
-        <p class="slds-p-horizontal_small">Card Body (custom component)</p>
-        <p slot="footer">Card Footer</p>
+        <lightning-combobox 
+            name="File_Status__c"
+            label="File Status" 
+            options={fileStatusOptions} 
+            onchange={handleInputChange}>
+        </lightning-combobox>
+
+        <lightning-input 
+            type="number"
+            name="Number_of_children_under_age_17__c"
+            label="Number of children under age 17" 
+            value={jobApplication.Number_of_children_under_age_17__c} 
+            onchange={handleInputChange}>
+        </lightning-input>
+
+        <lightning-input 
+            type="number"
+            name="Number_of_other_dependents__c"
+            label="Number of other dependents" 
+            value={jobApplication.Number_of_other_dependents__c} 
+            onchange={handleInputChange}>
+        </lightning-input>
+
+        <lightning-input 
+            type="number"
+            name="Pretax_Deductions_Withheld__c"
+            label="Pretax deductions withheld" 
+            value={jobApplication.Pretax_Deductions_Withheld__c} 
+            formatter="currency" 
+            step="0.01"
+            onchange={handleInputChange}>
+        </lightning-input>
+
+        <lightning-input 
+            type="number"
+            name="State_Income_Tax_Rate__c"
+            label="State income tax rate (%)" 
+            value={jobApplication.State_Income_Tax_Rate__c} 
+            onchange={handleInputChange}>
+        </lightning-input>
+
+        <lightning-input 
+            type="number"
+            name="City_Income_Tax_Rate__c"
+            label="City income tax rate (%)" 
+            value={jobApplication.City_Income_Tax_Rate__c} 
+            onchange={handleInputChange}>
+        </lightning-input>
+
+        <!-- Display Breakdown -->
+        <p class="slds-p-horizontal_small">Taxes Breakdown:</p>
+        <p class="slds-p-horizontal_small">
+            Federal Tax: <strong>${federalTax}</strong>
+        </p>
+        <p class="slds-p-horizontal_small">
+            Social Security Tax: <strong>${socialSecurityTax}</strong>
+        </p>
+        <p class="slds-p-horizontal_small">
+            Medicare Tax: <strong>${medicareTax}</strong>
+        </p>
+
+        <p class="slds-p-horizontal_small">
+            Your Final Take-Home Pay: <strong>${takeHomePay}</strong>
+        </p>
     </lightning-card>
 </template>
