@@ -19,18 +19,20 @@ global class eventReminderScheduler implements Schedulable {
                                         AND OwnerId != null
                                        ];
 
+              
+        List<Messaging.SingleEmailMessage> emailsToSend = new List<Messaging.SingleEmailMessage>();
+
         for(Event ev : upcomingEvents) {
             Messaging.SingleEmailMessage email = new Messaging.SingleEmailMessage();
-
-            email.setToAddresses(new String[] {ev.Owner.Email});
-            email.setToAddresses(new String [] {ev.OwnerId});
+            email.setToAddresses(new String[] { ev.OwnerId });
             email.setSubject('Reminder: You have an event coming up');
             email.setPlainTextBody('The event \'' + ev.Subject + '\' that starts at ' + ev.StartDateTime.format() + ' is coming up. Please don\'t forget to conduct company research and review the job description.');
+            emailsToSend.add(email);
             
-
-            Messaging.sendEmail(new Messaging.SingleEmailMessage[] {email});
-            System.debug(Messaging.sendEmail(new Messaging.SingleEmailMessage[] {email}));
-
         }
+
+        Messaging.sendEmail(emailsToSend);            
+            System.debug(Limits.getEmailInvocations());
+            System.debug(emailsToSend.size());
     }
 }
