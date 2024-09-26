@@ -127,7 +127,7 @@ public with sharing class taskTriggerHandler {
                 Task tk5 = new Task(
                     OwnerId = jb.CreatedById, 
                     Subject = 'Send thank you emails within 24 hours', 
-                    ActivityDate = Date.Today() + 5, 
+                    ActivityDate = Date.Today() + 1, 
                     WhatId = jb.Id);
             
                 taskToInsert.add(tk1);
