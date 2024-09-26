@@ -1,17 +1,30 @@
 <template>
-    <lightning-card title="Take Home Pay Calculator">
-        <lightning-button label="Calculate" onclick={handleCalculateTaxes} slot="actions"></lightning-button>
-        
-        <!-- Input Fields -->
-        <lightning-input 
-            type="number"
-            name="Gross_Paycheck__c"
+    <lightning-card>
+        <div class="custom-title">
+            <h1 class="centered-title"> Salary Calculator</h1>
+        </div>
+
+        <!-- Container for Calculate and Save buttons aligned to the right -->
+        <div class="slds-grid slds-grid_align-end slds-m-bottom_small">
+            <lightning-button variant="brand" label="Calculate" 
+                onclick={handleCalculateTaxes}>
+            </lightning-button>
+
+            <lightning-button variant="success" label="Save" 
+                onclick={handleSave} class="slds-m-left_small">
+            </lightning-button>
+        </div>
+
+        <!-- Slider for Salary -->
+        <lightning-slider 
             label="Your job income (salary)" 
-            value={jobApplication.Gross_Paycheck__c} 
-            formatter="currency" 
-            step="0.01"
-            onchange={handleInputChange}>
-        </lightning-input>
+            min="0" 
+            max="500000" 
+            step="1000" 
+            value={jobApplication.Gross_Paycheck__c}
+            onchange={handleSliderChange}>
+        </lightning-slider>
+        <p>Your selected salary: <strong>${jobApplication.Gross_Paycheck__c}</strong></p>
 
         <lightning-combobox 
             name="Pay_Frequency__c"
@@ -24,25 +37,33 @@
         <lightning-combobox 
             name="File_Status__c"
             label="File Status" 
+            value={jobApplication.File_Status__c} 
             options={fileStatusOptions} 
             onchange={handleInputChange}>
         </lightning-combobox>
 
-        <lightning-input 
-            type="number"
-            name="Number_of_children_under_age_17__c"
-            label="Number of children under age 17" 
-            value={jobApplication.Number_of_children_under_age_17__c} 
-            onchange={handleInputChange}>
-        </lightning-input>
+        <!-- Grid Layout for Children and Dependents -->
+        <div class="slds-grid slds-wrap slds-gutters">
+            <div class="slds-col slds-size_1-of-2">
+                <lightning-input 
+                    type="number"
+                    name="Number_of_children_under_age_17__c"
+                    label="Number of children under age 17" 
+                    value={jobApplication.Number_of_children_under_age_17__c} 
+                    onchange={handleInputChange}>
+                </lightning-input>
+            </div>
 
-        <lightning-input 
-            type="number"
-            name="Number_of_other_dependents__c"
-            label="Number of other dependents" 
-            value={jobApplication.Number_of_other_dependents__c} 
-            onchange={handleInputChange}>
-        </lightning-input>
+            <div class="slds-col slds-size_1-of-2">
+                <lightning-input 
+                    type="number"
+                    name="Number_of_other_dependents__c"
+                    label="Number of other dependents" 
+                    value={jobApplication.Number_of_other_dependents__c} 
+                    onchange={handleInputChange}>
+                </lightning-input>
+            </div>
+        </div>
 
         <lightning-input 
             type="number"
@@ -71,19 +92,16 @@
         </lightning-input>
 
         <!-- Display Breakdown -->
-        <p class="slds-p-horizontal_small">Taxes Breakdown:</p>
-        <p class="slds-p-horizontal_small">
-            Federal Tax: <strong>${federalTax}</strong>
-        </p>
-        <p class="slds-p-horizontal_small">
-            Social Security Tax: <strong>${socialSecurityTax}</strong>
-        </p>
-        <p class="slds-p-horizontal_small">
-            Medicare Tax: <strong>${medicareTax}</strong>
-        </p>
-
-        <p class="slds-p-horizontal_small">
-            Your Final Take-Home Pay: <strong>${takeHomePay}</strong>
-        </p>
+        <template if:true={showBreakdown}>
+            <lightning-card>
+                <h2 class="centered-breakdown-title">Taxes Breakdown</h2>
+                <div class="slds-p-around_small tax-breakdown">
+                    <p>Federal Tax: <strong>${federalTax}</strong></p>
+                    <p>Social Security Tax: <strong>${socialSecurityTax}</strong></p>
+                    <p>Medicare Tax: <strong>${medicareTax}</strong></p>
+                    <p>Your Final Take-Home Pay: <strong>${takeHomePay}</strong></p>
+                </div>
+            </lightning-card>
+        </template>
     </lightning-card>
 </template>
