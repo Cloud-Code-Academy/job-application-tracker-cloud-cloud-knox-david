@@ -1,28 +1,35 @@
-global class eventReminderScheduler implements Schedulable {
+global class eventReminderScheduler implements Schedulable, Database.Batchable<SObject>, Database.Stateful {
     
     global void execute(SchedulableContext sc) {
-        sendEventReminders();
+        //Start batch job...
+        Database.executeBatch(this, 200);
     }
 
-    public static void sendEventReminders() {
+    global Database.QueryLocator start (Database.BatchableContext bc) {
         Date tomorrow = Date.today().addDays(1);
 
-        List<Event> upcomingEvents = [SELECT Id,
-                                            Subject,
-                                            StartDateTime, 
-                                            EndDateTime, 
-                                            OwnerId,
-                                            Owner.Email, 
-                                            WhatId 
-                                        FROM Event 
-                                        WHERE StartDateTime >= :tomorrow
-                                        AND OwnerId != null
-                                       ];                                      
+        return Database.getQueryLocator([
+            SELECT Id,
+               Subject,
+               StartDateTime, 
+               EndDateTime, 
+               OwnerId,
+               Owner.Email, 
+               WhatId 
+            FROM Event 
+            WHERE StartDateTime >= :tomorrow
+            AND OwnerId != null
+            ]);           
+        
+    }
+        
+
+    global void execute (Database.BatchableContext bc, List<Event> events) {
  
               
         List<Messaging.SingleEmailMessage> emailsToSend = new List<Messaging.SingleEmailMessage>();
 
-        for(Event ev : upcomingEvents) {
+        for(Event ev : events) {
                 Messaging.SingleEmailMessage email = new Messaging.SingleEmailMessage();
                 email.setToAddresses(new String[] { ev.OwnerId });
                 email.setSubject('Reminder: You have an event coming up');
@@ -35,9 +42,14 @@ global class eventReminderScheduler implements Schedulable {
             Messaging.sendEmail(emailsToSend);       
 
         }
-
             System.debug(emailsToSend.size());      
             System.debug(Limits.getEmailInvocations());
             
+    }
+
+    global void finish(Database.BatchableContext BC) {
+        //In the future I can add post processes logic here...
+        System.debug('Batch job completed for event reminders..');
+    
     }
 }

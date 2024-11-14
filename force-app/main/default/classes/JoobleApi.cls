@@ -1,6 +1,6 @@
-global class JoobleApiScheduler implements Schedulable {
+global class JoobleApi implements Schedulable {
         
     global void execute(SchedulableContext sc) {
-            //JoobleJobSearchService.getJobs();
+            JoobleJobService.getJobs();
     }
 }
