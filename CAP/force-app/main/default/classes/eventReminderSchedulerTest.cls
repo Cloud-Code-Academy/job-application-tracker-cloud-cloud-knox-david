@@ -3,7 +3,7 @@ private class eventReminderSchedulerTest {
 
     @isTest
     static void testEventReminderBatch() {
-        // Create test data
+        //Create test data...
         User testUser = [SELECT Id, Email FROM User WHERE IsActive = true LIMIT 1];
 
         List<Event> testEvents = new List<Event>();
@@ -21,24 +21,21 @@ private class eventReminderSchedulerTest {
 
         insert testEvents;
 
-        // Enable debug logging for the batch job
+        //Enable debug logging for the batch job...
         System.debug('Inserted Events: ' + testEvents);
 
-        // Run the batch job
+        //Run the batch job...
         Test.startTest();
-
-        // Execute the batch
+        //Execute the batch...
         EventReminderScheduler batchJob = new EventReminderScheduler();
         Database.executeBatch(batchJob, 200);
-
         Test.stopTest();
 
-        // Verify the test events still exist
+        //Verify the test events still exist...
         List<Event> queriedEvents = [SELECT Id, Subject, StartDateTime, OwnerId FROM Event WHERE Id IN :testEvents];
         System.assertEquals(5, queriedEvents.size(), 'Five events should exist.');
 
-        // Verify debug logs or other side effects
-        // NOTE: We cannot verify email sending directly but can verify the correct setup
+        //Verify debug logs or other side effects...
         System.assert(true, 'Batch job finished execution without errors.');
     }
 
