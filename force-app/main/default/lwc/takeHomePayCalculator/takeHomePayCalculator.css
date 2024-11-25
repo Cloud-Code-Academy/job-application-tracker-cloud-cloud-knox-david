@@ -1,25 +1,76 @@
+/* Main Container Styling */
+.salary-calculator-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Center everything horizontally */
+    margin: auto;
+    max-width: 600px; /* Restrict maximum width for better readability */
+    padding: 20px;
+    background-color: white; /* White background */
+    border-radius: 8px; /* Rounded corners */
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+    box-sizing: border-box;
+}
+
+/* Title Styling */
 .centered-title {
     text-align: center;
     border-bottom: 2px solid #000;
     padding-bottom: 5px;
     font-weight: bold;
     margin-bottom: 20px;
-    font-size: 1.5rem; /* Larger title size */
+    font-size: 2rem; /* Larger font size for prominence */
 }
 
-.custom-title {
-    margin-bottom: 20px;
-}
-
+/* Breakdown Title Styling */
 .centered-breakdown-title {
     text-align: center;
     font-weight: bold;
-    margin-top: 10px;
-    font-size: 1.5rem;
+    margin-top: 20px; /* Space above Taxes Breakdown */
+    font-size: 1.8rem; /* Slightly larger font size */
     border-bottom: 2px solid #000;
-    padding-bottom: 5px; /* Match size of main title */
+    padding-bottom: 5px;
+}
+
+/* Input Fields and Combobox Styling */
+.salary-input,
+.salary-combobox {
+    margin-bottom: 20px; /* Consistent spacing between fields */
+    width: 100%; /* Full width to align inputs */
+    max-width: 500px; /* Restrict input field width */
+    display: block; /* Ensure inputs align vertically */
+}
+
+/* Slider Styling */
+.salary-slider {
+    margin-bottom: 20px; /* Space below slider */
+    width: 100%; /* Full width slider */
+    max-width: 500px; /* Restrict width for consistency */
+}
+
+/* Buttons Styling */
+.salary-buttons {
+    display: flex;
+    justify-content: center; /* Center buttons */
+    gap: 15px; /* Space between buttons */
+    margin-top: 20px; /* Space above buttons */
+    width: 100%; /* Ensure buttons align with inputs */
+    max-width: 500px;
+}
+
+/* Taxes Breakdown Styling */
+.tax-breakdown {
+    text-align: center;
+    margin-top: 30px; /* Space above the breakdown section */
+    width: 100%;
+    max-width: 500px; /* Restrict width to align with inputs */
 }
 
 .tax-breakdown p {
-    text-align: center;
+    margin: 5px 0; /* Add spacing between paragraphs */
+}
+
+
+.taxes{
+       font: bold;
 }

@@ -6,18 +6,18 @@ public class JoobleJobService {
     @future(callout=true)
     public static void getJobs() {
     
-        // Filter criteria...
+        //Filter criteria...
         String keyword = 'Salesforce';
         String location = 'Georgia';
         Date datecreatedfrom = Date.today().addDays(-1);
-        Integer resultonpage = 2;
+        //Integer resultonpage = 2;
 
-        // Prepare request payload...
+        //Prepare request payload...
         Map<String, Object> requestBody = new Map<String, Object>{
             'keywords' => keyword,
             'location' => location,
-            'datecreatedfrom' => datecreatedfrom.year() + '-' + datecreatedfrom.month() + '-' + datecreatedfrom.day(),
-            'resultonpage' => resultonpage
+            'datecreatedfrom' => datecreatedfrom.year() + '-' + datecreatedfrom.month() + '-' + datecreatedfrom.day()
+            //'resultonpage' => resultonpage
         };
     
         // Make HTTP request to Jooble API...
@@ -35,7 +35,7 @@ public class JoobleJobService {
             if (response.getStatusCode() == 200) {
                 System.debug('Raw Response: ' + response.getBody());
     
-                // Deserialize the JSON response...
+                //Deserialize the JSON response...
                 Map<String, Object> jsonResponse = (Map<String, Object>) JSON.deserializeUntyped(response.getBody());
 
                 if(jsonResponse.get('jobs') != null) {                    
@@ -43,22 +43,31 @@ public class JoobleJobService {
 
                     List<Job_Application__c> jobApplications = new List<Job_Application__c>();
 
-                    // Iterate over the jobList, casting each item to Map<String, Object>...
+                    //Iterate over the jobList, casting each item to Map<String, Object>...
                     for(Object jobObj : jobList) {
                         Map<String, Object> job = (Map<String, Object>) jobObj;
                         Job_Application__c jobApplication = new Job_Application__c();
                         
-                        jobApplication.Name = (String) job.get('title');
+                        //Use String.valueOf to safely handle the object...
+                        String title = String.valueOf(job.get('title'));
+                        //Truncate to 80 characters if needed...
+                        jobApplication.Name = title.length() > 80 ? title.substring(0, 80) : title;
                         jobApplication.Salary__c = parseSalary(job.get('salary'));
                         jobApplication.Url__c = (String) job.get('link');
-                        jobApplication.Description__c = ('Company: '+ job.get('company'))+ '' + removeHTMLChar(job.get('snippet'));
+                        //Handle job.get('snippet') by converting it to a String...
+                        String snippet = String.valueOf(job.get('snippet'));
+
+                        //Check length and truncate if necessary....
+                        jobApplication.Description__c = 
+                            'Company: ' + job.get('company') + ' ' + 
+                            removeHTMLChar(snippet.length() > 32000 ? snippet.substring(0, 32000) : snippet);
                         jobApplication.Jooble_Id__c = String.valueOf((Long) job.get('id'));
                         jobApplication.Current_Status__c = 'Saved';
 
                         jobApplications.add(jobApplication);                        
                     }
 
-                    // Insert Job_Application__c records if the list is not empty...
+                    //Insert Job_Application__c records if the list is not empty...
                     if(jobApplications.size() > 0) {
                         try {
                             insert jobApplications;

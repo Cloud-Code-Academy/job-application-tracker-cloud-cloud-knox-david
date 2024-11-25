@@ -47,7 +47,7 @@ global class eventReminderScheduler implements Schedulable, Database.Batchable<S
             
     }
 
-    global void finish(Database.BatchableContext BC) {
+    global void finish(Database.BatchableContext bc) {
         //In the future I can add post processes logic here...
         System.debug('Batch job completed for event reminders..');
     
